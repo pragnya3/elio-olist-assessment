@@ -49,7 +49,11 @@ replacement character) found 0 rows.
 `olist_order_payments`, `olist_sellers` and `olist_geolocation` are staged but not loaded,
 because the planned analysis does not need them.
 
-## Duplicate checks (to be filled in)
-- Duplicate `order_id` in orders: _TBC_
-- Duplicate `review_id` in reviews: _TBC_
-- Orders with more than one review: _TBC_
+## Duplicate checks
+Query: `03_duplicate_checks.sql`
+- Duplicate `order_id` in orders: 0 (unique, safe as a key)
+- Duplicate `review_id` in reviews: 814 (the same review_id appears on more than one row)
+- Orders with more than one review: 547
+
+Implication: reviews must be deduplicated in staging before joining to orders,
+otherwise order and revenue figures would be inflated.

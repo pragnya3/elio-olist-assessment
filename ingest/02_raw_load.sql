@@ -70,3 +70,29 @@ COPY INTO OLIST.RAW.PRODUCT_CATEGORY_TRANSLATION
 FROM (SELECT $1,$2, METADATA$FILENAME, CURRENT_TIMESTAMP()
       FROM @OLIST.RAW.OLIST_STAGE/product_category_name_translation.csv)
 ON_ERROR = 'ABORT_STATEMENT';
+
+SELECT 'orders' t, COUNT(*) n FROM OLIST.RAW.ORDERS
+UNION ALL SELECT 'order_items', COUNT(*) FROM OLIST.RAW.ORDER_ITEMS
+UNION ALL SELECT 'customers', COUNT(*) FROM OLIST.RAW.CUSTOMERS
+UNION ALL SELECT 'products', COUNT(*) FROM OLIST.RAW.PRODUCTS
+UNION ALL SELECT 'reviews', COUNT(*) FROM OLIST.RAW.ORDER_REVIEWS
+UNION ALL SELECT 'translation', COUNT(*) FROM OLIST.RAW.PRODUCT_CATEGORY_TRANSLATION;
+
+SELECT review_comment_message
+FROM OLIST.RAW.ORDER_REVIEWS
+WHERE review_comment_message LIKE '%ã%'
+LIMIT 10;
+
+SELECT
+  COUNT_IF(review_comment_message LIKE '%�%')  AS replacement_char,
+  COUNT_IF(review_comment_message LIKE '%Ã£%'
+        OR review_comment_message LIKE '%Ã§%'
+        OR review_comment_message LIKE '%Ã©%'
+        OR review_comment_message LIKE '%Ã³%'
+        OR review_comment_message LIKE '%Ãº%') AS mojibake_pairs
+FROM OLIST.RAW.ORDER_REVIEWS;
+
+SELECT review_comment_message
+FROM OLIST.RAW.ORDER_REVIEWS
+WHERE review_comment_message LIKE '%Ã%'
+LIMIT 10;
