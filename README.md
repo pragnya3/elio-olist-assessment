@@ -4,11 +4,11 @@ Small ELT pipeline and commercial analysis built for Elio's Data & AI Engineer t
 
 Raw CSV files (Olist Brazilian E-Commerce dataset) loaded into Snowflake, cleaned in dbt staging models, shaped into a star schema in marts, and used to produce one concrete commercial recommendation. GitHub Actions workflow rebuilds and tests the project on every pull request.
 
-**Platform:** Snowflake (default given in the brief), with all transformations in dbt.
+**Platform:** Snowflake, with all transformations in dbt.
 
 ## Results at a glance
 
-Full write-up and client memo in `analysis_answers.md`.
+Full write up and client memo in `analysis_answers.md`.
 
 - **Late deliveries hurt reviews.** Orders delivered on time average 4.29 stars; orders 8+ days late average 1.70. About 6.7% of delivered orders arrive late.
 - **Almost nobody buys twice.** Only 3.04% of customers (2,887 of 94,983) place a second order.
@@ -57,13 +57,13 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-**2. Get the data.** Download Olist dataset via Kaggle and unzip. The pipeline uses six files: orders, order_items, customers, products, order_reviews and product_category_translation.
+**2. Get the data.** Downloaded Olist dataset via Kaggle. Pipeline uses six files: orders, order_items, customers, products, order_reviews and product_category_translation.
 
-**3. Create Snowflake objects.** In a Snowsight worksheet, run `ingest/01_setup.sql` (use Run All). It creates the warehouse, database, schemas, a CSV file format and an internal stage `OLIST.RAW.OLIST_STAGE`.
+**3. Create Snowflake objects.** In Snowsight worksheet, run `ingest/01_setup.sql` (use Run All). It creates warehouse, database, schemas, a CSV file format and an internal stage `OLIST.RAW.OLIST_STAGE`.
 
-**4. Upload the files (manual step).** In Snowsight go to the database explorer, open `OLIST` > `RAW` > Stages > `OLIST_STAGE`, click **+ Files**, and upload the six CSVs. (The Snowflake CLI or SnowSQL `PUT` command also works.) Check with `LIST @OLIST.RAW.OLIST_STAGE;`.
+**4. Upload the files (manual step).** In Snowsight go to database explorer, open `OLIST` > `RAW` > Stages > `OLIST_STAGE`, click **+ Files**, and upload six CSVs. (The Snowflake CLI or SnowSQL `PUT` command also works.) Check with `LIST @OLIST.RAW.OLIST_STAGE;`.
 
-**5. Load the raw tables.** Run `ingest/02_raw_load.sql` (Run All). Expected row counts: orders 99,441; order_items 112,650; customers 99,441; products 32,951; order_reviews 99,224; translation 71. `ingest/03_duplicate_checks.sql` is an optional check; findings are in `ingest/NOTES.md`.
+**5. Load the raw tables.** Run `ingest/02_raw_load.sql` (Run All). Expected row counts: orders 99,441; order_items 112,650; customers 99,441; products 32,951; order_reviews 99,224; translation 71. `ingest/03_duplicate_checks.sql` is optional check; findings are in `ingest/NOTES.md`.
 
 **6. Configure dbt.** Copy the example profile and set your credentials as environment variables (never commit them; `.env` and `profiles.yml` are git-ignored):
 ```bash
