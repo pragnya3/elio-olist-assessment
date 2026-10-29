@@ -42,6 +42,7 @@ dbt_project/
   packages.yml           dbt package dependencies (dbt_utils)
   profiles.yml.example   connection template using environment variables (dev and ci targets)
 docs/data_model.md       3NF ERD, star schema, keys, materialisation reasoning
+app/                     Optional local Streamlit app to explore the marts
 sql/analytics_queries.sql  Analytics queries run against the marts
 analysis_answers.md      Part B: insights, recommendation, caveats, client memo, LLM idea
 requirements.txt         Pinned dbt versions
@@ -107,6 +108,19 @@ A clean run is 3 mart tables, 6 staging views and 39 tests: `PASS=48 ERROR=0`.
 
 Work was done on feature branches and merged into `main` through pull requests (`feature/pipeline` for the pipeline and analysis, `feature/ci` for the CI workflow), with small commits per logical step. No credentials, `profiles.yml`, `.env` or data files are in the repo.
 
+## Optional: explore the results (Streamlit)
+
+A small local app reads the marts in Snowflake and shows the repeat rate, monthly revenue, the state breakdown and delivery time vs review scores. It uses the same environment variables as dbt and only runs read queries against `OLIST.MARTS`.
+
+```bash
+source .venv/bin/activate
+source .env
+pip install -r app/requirements.txt
+python -m streamlit run app/app.py
+```
+
+It opens at http://localhost:8501. Streamlit shows a "Deploy" button; the app is not deployed, only run locally.
+
 ## Assumptions and shortcuts (given the time limit)
 
 - Only six of the nine files are loaded; payments, sellers and geolocation were not needed for the analysis.
@@ -115,6 +129,7 @@ Work was done on feature branches and merged into `main` through pull requests (
 - CI builds into an empty `OLIST_CI` database rather than a zero-copy clone of production.
 - Staging `relationships` tests use the older `to`/`field` syntax, which dbt 1.10 flags with deprecation warn (marts use the newer `arguments` syntax). runs fine.
 - The campaign uplift in Part B is an assumption, labelled as such, to be replaced by a measured result from the proposed test.
+- The Streamlit app is local only, has no tests, and authenticates with a password from environment variables, like dbt.
 
 ## What I would do next
 
@@ -123,3 +138,4 @@ Work was done on feature branches and merged into `main` through pull requests (
 - Source freshness checks and row-count monitoring, plus the production data quality checks listed in `analysis_answers.md`.
 - Load payments and sellers to add payment mix and seller-level delivery analysis.
 - Classify review comments into complaint themes.
+
