@@ -1,0 +1,76 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: One row per real customer (customer_unique_id), with location from their latest order.
+    columns:
+      - name: customer_key
+        description: Surrogate key hashed from customer_unique_id.
+        tests: [unique, not_null]
+      - name: customer_unique_id
+        description: Natural key identifying the person across orders.
+        tests: [unique, not_null]
+      - name: zip_code_prefix
+        description: First digits of the postcode, kept as text.
+      - name: city
+        description: Customer city as of their most recent order (lowercase).
+      - name: state
+        description: Brazilian state code.
+      - name: first_order_at
+        description: Timestamp of the customer's first order.
+      - name: last_order_at
+        description: Timestamp of the customer's most recent order.
+
+  - name: dim_products
+    description: One row per product, with English category name.
+    columns:
+      - name: product_key
+        description: Surrogate key hashed from product_id.
+        tests: [unique, not_null]
+      - name: product_id
+        description: Natural key from the source.
+        tests: [unique, not_null]
+      - name: category_name
+        description: English category; Portuguese name if untranslated, 'unknown' if missing.
+        tests: [not_null]
+
+  - name: fct_order_items
+    description: Order-item grain fact table. Links to customers and products by surrogate key.
+    columns:
+      - name: order_item_key
+        description: Surrogate key hashed from order_id and item number.
+        tests: [unique, not_null]
+      - name: customer_key
+        description: Foreign key to dim_customers.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_key
+      - name: product_key
+        description: Foreign key to dim_products.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_products')
+                field: product_key
+      - name: price
+        description: Item price in BRL, excluding freight.
+        tests: [not_null]
+      - name: freight_value
+        description: Freight charged for this item in BRL.
+      - name: item_total_value
+        description: price plus freight_value.
+      - name: purchase_date
+        description: Date the order was placed.
+        tests: [not_null]
+      - name: delivery_days
+        description: Days from purchase to delivery; NULL if not delivered.
+      - name: days_vs_estimate
+        description: Days delivered after the estimated date (negative means early); NULL if not delivered.
+      - name: is_late
+        description: True if delivered after the estimated delivery date; NULL if not delivered.
+      - name: review_score
+        description: Latest review score (1 to 5) for the order; NULL if no review.
