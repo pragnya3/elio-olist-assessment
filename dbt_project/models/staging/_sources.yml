@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Olist CSVs loaded as-is into Snowflake (all VARCHAR plus load metadata).
+    database: OLIST
+    schema: RAW
+    tables:
+      - name: orders
+      - name: order_items
+      - name: customers
+      - name: products
+      - name: order_reviews
+      - name: product_category_translation
