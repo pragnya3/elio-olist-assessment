@@ -6,3 +6,4 @@ dbt_packages/
 *.csv
 .venv/
 .DS_Store
+.user.yml
