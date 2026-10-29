@@ -1,0 +1,84 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: One row per order, cleaned and typed.
+    columns:
+      - name: order_id
+        description: Unique order identifier.
+        tests: [unique, not_null]
+      - name: customer_id
+        description: Per-order customer id; links to stg_customers.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: order_status
+        description: Lifecycle status of the order, lowercased.
+        tests:
+          - accepted_values:
+              values: [delivered, shipped, canceled, unavailable, invoiced, processing, created, approved]
+
+  - name: stg_customers
+    description: One row per customer_id (a person can have several customer_ids).
+    columns:
+      - name: customer_id
+        description: Per-order customer id.
+        tests: [unique, not_null]
+      - name: customer_unique_id
+        description: Identifies the actual person across orders.
+        tests: [not_null]
+
+  - name: stg_products
+    description: One row per product.
+    columns:
+      - name: product_id
+        description: Unique product identifier.
+        tests: [unique, not_null]
+
+  - name: stg_product_category_translation
+    description: Portuguese to English product category names.
+    columns:
+      - name: category_name_pt
+        description: Category name in Portuguese.
+        tests: [unique, not_null]
+
+  - name: stg_order_items
+    description: One row per item within an order.
+    columns:
+      - name: order_item_key
+        description: Surrogate key hashed from order_id and order_item_number.
+        tests: [unique, not_null]
+      - name: order_id
+        description: Parent order.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: product_id
+        description: Product sold on this line.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_products')
+              field: product_id
+
+  - name: stg_order_reviews
+    description: One row per (review_id, order_id). review_id alone is not unique in the source.
+    columns:
+      - name: review_key
+        description: Surrogate key hashed from review_id and order_id.
+        tests: [unique, not_null]
+      - name: order_id
+        description: Reviewed order.
+        tests:
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: review_score
+        description: Customer rating from 1 to 5.
+        tests:
+          - accepted_values:
+              values: [1, 2, 3, 4, 5]
