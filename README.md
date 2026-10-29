@@ -119,11 +119,9 @@ pip install -r app/requirements.txt
 python -m streamlit run app/app.py
 ```
 
-It opens at http://localhost:8501. Streamlit shows a "Deploy" button; the app is not deployed, only run locally.
-
 ## Assumptions and shortcuts (given the time limit)
 
-- Only six of the nine files are loaded; payments, sellers and geolocation were not needed for the analysis.
+- Only six of the nine files are loaded, ie payments, sellers and geolocation were not needed for the analysis.
 - The upload step is manual (Snowsight UI), not scripted.
 - I used `ACCOUNTADMIN` on a trial account for speed, including in CI with a password stored as a GitHub secret. In production I would use separate dev and prod databases, least-privilege roles, and key-pair or OIDC authentication.
 - CI builds into an empty `OLIST_CI` database rather than a zero-copy clone of production.
@@ -134,8 +132,8 @@ It opens at http://localhost:8501. Streamlit shows a "Deploy" button; the app is
 ## What I would do next
 
 - Harden CI: dedicated CI role, key-pair or OIDC authentication instead of a stored password, and a zero-copy clone of production per pull request.
-- Make `fct_order_items` incremental (merge on `order_item_key`) and add dbt snapshot (SCD type 2) on `dim_customers`.
-- Source freshness checks and row-count monitoring, plus the production data quality checks listed in `analysis_answers.md`.
-- Load payments and sellers to add payment mix and seller-level delivery analysis.
-- Classify review comments into complaint themes.
+- Make `fct_order_items` incremental (merge on `order_item_key`) and add dbt snapshot (SCD type 2) on `dim_customers`
+- Source freshness checks and row-count monitoring, plus the production data quality checks listed in `analysis_answers.md`
+- Load payments and sellers to add payment mix and seller-level delivery analysis
+- Classify review comments into complaint themes
 
